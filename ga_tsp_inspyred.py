@@ -10,7 +10,7 @@ This is how the TSP benchmark represents solutions.
 Author: rex_huang61
 E-mail: 442193160@qq.com
 Github: https://github.com/zhiruihuang/Artificial_Intelligence/
-Date: 2017/11/27
+Date: 2017/12/04
 """
 print(__doc__)
 
@@ -38,7 +38,8 @@ def plot(points, result):
     plt.ylabel('latitude')
     plt.show()
 
-def polygon_observer(population, num_generations, num_evaluations, args):
+def tsp_observer(population, num_generations, num_evaluations, args):
+    global points
     try:
         canvas = args['canvas']
     except KeyError:
@@ -46,52 +47,15 @@ def polygon_observer(population, num_generations, num_evaluations, args):
         args['canvas'] = canvas
         
     result = population[0].candidate
-    # old_verts = canvas.find_withtag('vert')
-    # for v in old_verts:
-    #     canvas.delete(v)
     old_lines = canvas.find_withtag('line')
     for l in old_lines:
         canvas.delete(l)
-    points = [(116.46, 39.92), 
-              (117.2,39.13), 
-              (121.48, 31.22), 
-              (106.54, 29.59), 
-              (91.11, 29.97), 
-              (87.68, 43.77), 
-              (106.27, 38.47), 
-              (111.65, 40.82), 
-              (108.33, 22.84), 
-              (126.63, 45.75), 
-              (125.35, 43.88), 
-              (123.38, 41.8), 
-              (114.48, 38.03), 
-              (112.53, 37.87), 
-              (101.74, 36.56), 
-              (117,36.65), 
-              (113.6,34.76), 
-              (118.78, 32.04), 
-              (117.27, 31.86), 
-              (120.19, 30.26), 
-              (119.3, 26.08), 
-              (115.89, 28.68), 
-              (113, 28.21), 
-              (114.31, 30.52), 
-              (113.23, 23.16), 
-              (121.5, 25.05), 
-              (110.35, 20.02), 
-              (103.73, 36.03), 
-              (108.95, 34.27), 
-              (104.06, 30.67), 
-              (106.71, 26.57), 
-              (102.73, 25.04), 
-              (114.1, 22.2), 
-              (113.33, 22.13)] # 城市坐标
     vert_radius = 5
     for (x, y) in points:
         x = x-85
         y = y-15
         y = 35-y
-        canvas.create_oval(x*10-vert_radius, y*10-vert_radius, x*10+vert_radius, y*10+vert_radius, fill='green', tags='vert')
+        canvas.create_oval(x*10-vert_radius, y*10-vert_radius, x*10+vert_radius, y*10+vert_radius, fill='blue', tags='vert')
     rs = result
     for i in range(len(rs)-1):
         x1 = points[rs[i]][0]-85
@@ -103,9 +67,7 @@ def polygon_observer(population, num_generations, num_evaluations, args):
         canvas.create_line(x1*10, y1*10, x2*10, y2*10, fill="red", tags="line")
     canvas.pack()
     canvas.update()
-    # print('{0} evaluations'.format(num_evaluations))
-    print('Current Solution: : {0}'.format(1/population[0].fitness))
-    # print('Current Solution: {0}: {1}'.format(str(population[0].candidate), 1/population[0].fitness))
+    print('{0} generations, Solution: : {1}'.format(num_generations, 1/population[0].fitness))
     sleep(0.05)
 
 
@@ -113,6 +75,8 @@ def main(prng=None, display=False):
     if prng is None:
         prng = Random() # 随机数发生器
         prng.seed(time()) # 时间种子
+
+    global points
     points = [(116.46, 39.92), 
               (117.2,39.13), 
               (121.48, 31.22), 
@@ -163,7 +127,7 @@ def main(prng=None, display=False):
     window.title('TSP')
     can = Canvas(window, bg='white', height=350, width=450)
     can.pack()
-    ea.observer = polygon_observer
+    ea.observer = tsp_observer
     final_pop = ea.evolve(generator=problem.generator, # 发生器
                           evaluator=problem.evaluator, # 评估器
                           pop_size=100, # 个体数目
